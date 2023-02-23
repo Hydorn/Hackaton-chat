@@ -1,0 +1,47 @@
+.container {
+  width: min(400px, 100vw);
+  height: 100svh;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #0a1014;
+}
+.chats {
+  flex: 2;
+  overflow-y: scroll;
+}
+.input_container {
+  display: flex;
+  align-items: center;
+  height: 6rem;
+  background-color: #111b21;
+  display: flex;
+  width: 100%;
+}
+.input {
+  flex: 1;
+  margin: 1rem;
+  padding: 1rem;
+  border-radius: 50px;
+  border: none;
+
+  &:focus {
+    outline: none;
+  }
+}
+.send_btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 4rem;
+  height: 4rem;
+  margin-right: 1rem;
+  border-radius: 50%;
+  &:hover {
+    background-color: #f4f4f450;
+    cursor: pointer;
+  }
+}
+.icon {
+  color: #f4f4f4;
+}
