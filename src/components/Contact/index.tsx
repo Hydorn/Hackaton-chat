@@ -1,15 +1,10 @@
 import { onAuthStateChanged, User } from "firebase/auth";
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { auth } from "../../Auth/FB-config";
 import { Users } from "../../types";
 import styles from "./styles.module.scss";
-type ContatProps = {
-  userID: string;
-  username: string;
-  email: string;
-  profile_picture: string;
-};
+
 const Contact: React.FC<Users> = ({
   userID,
   username,
@@ -18,6 +13,7 @@ const Contact: React.FC<Users> = ({
 }) => {
   const [user, setUser] = useState<User | null>(null);
   const [chatID, setChatID] = useState("");
+  const { pathname } = useLocation();
 
   const navigate = useNavigate();
   const picture = profile_picture;
@@ -28,6 +24,8 @@ const Contact: React.FC<Users> = ({
     } else return "404";
   };
   useEffect(() => {
+    console.log(pathname);
+
     onAuthStateChanged(auth, (user) => {
       if (user) {
         setUser(user);
@@ -39,9 +37,14 @@ const Contact: React.FC<Users> = ({
     setChatID(chatId());
   }, [user, userID]);
   return (
-    <Link to={`room/${chatID}`} className={styles.link}>
+    <Link
+      to={pathname === "/chat" ? `room/${chatID}` : "/chat"}
+      className={styles.link}
+    >
       <div className={styles.container}>
-        <img src={picture} className={styles.avatar} alt="" />
+        {picture ? (
+          <img src={picture} className={styles.avatar} alt="" />
+        ) : null}
 
         <div className={styles.user_info}>
           <h4>{username}</h4>

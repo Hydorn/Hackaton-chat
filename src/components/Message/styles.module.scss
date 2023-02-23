@@ -8,10 +8,14 @@
   padding: 1rem;
   margin: 1rem;
   border-radius: 5px;
+  overflow-wrap: anywhere;
+  max-width: 90%;
 }
 .mine {
   margin-left: auto;
 }
 .title {
+  align-self: flex-end;
   font-size: 1.2rem;
+  margin-bottom: 1rem;
 }

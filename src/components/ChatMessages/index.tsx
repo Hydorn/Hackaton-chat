@@ -1,5 +1,5 @@
 import { onValue, ref } from "firebase/database";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { dataBase } from "../../Auth/FB-config";
 import { Message as MessageType } from "../../types";
 import Message from "../Message";
@@ -15,6 +15,12 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
   roomID,
 }) => {
   const [messages, setMessages] = useState<MessageType[]>([]);
+
+  const myRef = useRef<HTMLDivElement | null>(null);
+  const scrollDown = () => {
+    console.log(myRef.current);
+    myRef.current?.scrollIntoView(true);
+  };
   useEffect(() => {
     const starCountRef = ref(dataBase, "room/" + roomID);
     onValue(starCountRef, (snapshot) => {
@@ -25,22 +31,28 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
           fetchedMessages.push(data[key]);
         }
       }
-      console.log(fetchedMessages);
 
       setMessages(fetchedMessages);
+      scrollDown();
     });
   }, []);
+
+  useEffect(() => {
+    scrollDown();
+  }, [messages]);
   return (
     <>
       {messages.map((el) => {
         return (
           <Message
             message={el.message}
+            senderName={el.senderName}
             senderID={el.senderID}
             receiverID={el.receiverID}
           />
         );
       })}
+      <div ref={myRef} />
     </>
   );
 };

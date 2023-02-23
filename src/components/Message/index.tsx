@@ -7,9 +7,15 @@ import styles from "./styles.module.scss";
 type MessageProps = {
   message: string;
   receiverID: string;
+  senderName: string;
   senderID: string;
 };
-const Message: React.FC<MessageProps> = ({ message, receiverID, senderID }) => {
+const Message: React.FC<MessageProps> = ({
+  message,
+  receiverID,
+  senderID,
+  senderName,
+}) => {
   const [user, setUser] = useState<User | null>(null);
   const [receiver, setReceiver] = useState<User | null>(null);
   const navigate = useNavigate();
@@ -18,22 +24,24 @@ const Message: React.FC<MessageProps> = ({ message, receiverID, senderID }) => {
       if (user) setUser(user);
       else navigate("/");
     });
+    console.log(user);
 
-    get(ref(dataBase, "users/" + receiverID))
-      .then((snapshot) => {
-        if (snapshot.exists()) {
-          const data = snapshot.val();
-          console.log(data);
-
-          setReceiver(data);
-        } else {
-          console.log("No data available");
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }, [receiverID]);
+    if (user?.uid !== senderID) {
+      get(ref(dataBase, "users/" + senderID))
+        .then((snapshot) => {
+          if (snapshot.exists()) {
+            const data = snapshot.val();
+            setReceiver(data);
+          } else {
+            console.log("No data available");
+          }
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
+    console.log(receiver);
+  }, []);
 
   return (
     <div
@@ -41,11 +49,7 @@ const Message: React.FC<MessageProps> = ({ message, receiverID, senderID }) => {
         user?.uid === senderID ? styles.mine : ""
       }`}
     >
-      <h3 className={styles.title}>
-        {user?.uid === senderID
-          ? user?.displayName || null
-          : receiver?.displayName || null}
-      </h3>
+      <h3 className={styles.title}>{senderName}</h3>
       <p>{message}</p>
     </div>
   );

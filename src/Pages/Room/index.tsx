@@ -1,6 +1,6 @@
 import { onAuthStateChanged, User } from "firebase/auth";
 import { push, ref, set, update } from "firebase/database";
-import { KeyboardEvent, useEffect, useState } from "react";
+import { KeyboardEvent, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { auth, dataBase } from "../../Auth/FB-config";
 import ChatMessages from "../../components/ChatMessages";
@@ -11,18 +11,22 @@ const Room = () => {
   const [message, setMessage] = useState("");
   const [user, setUser] = useState<User | null>(null);
   const [receiverID, setReceiverID] = useState("");
+
   const navigate = useNavigate();
 
   const handleChange = (e: React.FormEvent<HTMLInputElement>) => {
     setMessage((e.target as HTMLInputElement).value);
   };
   const { roomID } = useParams();
+
   const handleSubmit = () => {
+    if (message === "") return;
     try {
       push(ref(dataBase, "room/" + roomID), {
         timestamp: Date.now(),
         message,
         senderID: user?.uid,
+        senderName: user?.displayName,
         receiverID,
       });
       setMessage("");
@@ -38,8 +42,9 @@ const Room = () => {
   };
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
-      if (user) setUser(user);
-      else navigate("/");
+      if (user) {
+        setUser(user);
+      } else navigate("/");
     });
     if (user && roomID) {
       setReceiverID(roomID?.replace(user?.uid, ""));
@@ -48,7 +53,12 @@ const Room = () => {
 
   return (
     <div className={styles.container}>
-      <Contact userID={""} email={""} profile_picture={""} username={""} />
+      <Contact
+        userID={user?.uid || ""}
+        email={user?.email || ""}
+        profile_picture={user?.photoURL || undefined}
+        username={user?.displayName || "Not Found"}
+      />
       <div className={styles.chats}>
         <ChatMessages
           userID={user?.uid || ""}
@@ -62,6 +72,7 @@ const Room = () => {
           value={message}
           onKeyDown={handleKeyDown}
           className={styles.input}
+          autoComplete={"off"}
           type="text"
           name="message"
           placeholder="Write a message"
